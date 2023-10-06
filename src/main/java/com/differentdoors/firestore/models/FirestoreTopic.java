@@ -12,12 +12,10 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
-public class User {
+public class FirestoreTopic {
     @DocumentId
     private String id;
+    private String description;
     private String name;
-    private String email;
-    private List<String> tokens;
-    private String last_login;
-    private List<String> additional_managers;
+    private List<String> roles;
 }
