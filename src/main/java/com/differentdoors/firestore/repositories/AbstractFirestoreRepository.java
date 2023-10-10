@@ -14,13 +14,9 @@ import java.util.stream.Collectors;
 
 @Slf4j
 public abstract class AbstractFirestoreRepository<T> {
-    private final CollectionReference collectionReference;
-    private final String collectionName;
     private final Class<T> parameterizedType;
 
-    protected AbstractFirestoreRepository(Firestore firestore, String collection) {
-        this.collectionReference = firestore.collection(collection);
-        this.collectionName = collection;
+    protected AbstractFirestoreRepository() {
         this.parameterizedType = getParameterizedType();
     }
 
@@ -28,63 +24,6 @@ public abstract class AbstractFirestoreRepository<T> {
         ParameterizedType type = (ParameterizedType) this.getClass().getGenericSuperclass();
         return (Class<T>) type.getActualTypeArguments()[0];
     }
-
-    public boolean save(T model) {
-        String documentId = getDocumentId(model);
-        ApiFuture<WriteResult> resultApiFuture = collectionReference.document(documentId).set(model);
-
-        try {
-            log.info("{}-{} saved at{}", collectionName, documentId, resultApiFuture.get().getUpdateTime());
-            return true;
-        } catch (InterruptedException | ExecutionException e) {
-            log.error("Error saving {}={} {}", collectionName, documentId, e.getMessage());
-        }
-
-        return false;
-
-    }
-
-    public void delete(T model) {
-        String documentId = getDocumentId(model);
-        ApiFuture<WriteResult> resultApiFuture = collectionReference.document(documentId).delete();
-
-    }
-
-    public List<T> whereArrayContains(String field, List<String> value) {
-        ApiFuture<QuerySnapshot> querySnapshotApiFuture = collectionReference.whereArrayContainsAny(field, value).get();
-        return retrieveListByQuery(querySnapshotApiFuture);
-    }
-
-    public List<T> whereIn(String field, List<String> value) {
-        ApiFuture<QuerySnapshot> querySnapshotApiFuture = collectionReference.whereIn(field, value).get();
-        return retrieveListByQuery(querySnapshotApiFuture);
-    }
-
-    public List<T> all() {
-        ApiFuture<QuerySnapshot> querySnapshotApiFuture = collectionReference.get();
-        return retrieveListByQuery(querySnapshotApiFuture);
-    }
-
-
-    public Optional<T> get(String documentId) {
-        DocumentReference documentReference = collectionReference.document(documentId);
-        ApiFuture<DocumentSnapshot> documentSnapshotApiFuture = documentReference.get();
-
-        try {
-            DocumentSnapshot documentSnapshot = documentSnapshotApiFuture.get();
-
-            if (documentSnapshot.exists()) {
-                return Optional.ofNullable(documentSnapshot.toObject(parameterizedType));
-            }
-
-        } catch (InterruptedException | ExecutionException e) {
-            log.error("Exception occurred retrieving: {} {}, {}", collectionName, documentId, e.getMessage());
-        }
-
-        return Optional.empty();
-
-    }
-
 
     protected String getDocumentId(T t) {
         Object key;
@@ -120,14 +59,6 @@ public abstract class AbstractFirestoreRepository<T> {
         return null;
     }
 
-    protected CollectionReference getCollectionReference() {
-        return this.collectionReference;
-    }
-
-    protected Class<T> getType() {
-        return this.parameterizedType;
-    }
-
     protected List<T> retrieveListByQuery(ApiFuture<QuerySnapshot> querySnapshotApiFuture) {
         try {
             List<QueryDocumentSnapshot> queryDocumentSnapshots = querySnapshotApiFuture.get().getDocuments();
@@ -137,8 +68,25 @@ public abstract class AbstractFirestoreRepository<T> {
                     .collect(Collectors.toList());
 
         } catch (InterruptedException | ExecutionException e) {
-            log.error("Exception occurred while retrieving all document for {}", collectionName);
+            log.error("Exception occurred while retrieving all document");
         }
         return Collections.<T>emptyList();
+    }
+
+    protected Optional<T> retrieveDocument(DocumentReference documentReference) {
+        ApiFuture<DocumentSnapshot> documentSnapshotApiFuture = documentReference.get();
+
+        try {
+            DocumentSnapshot documentSnapshot = documentSnapshotApiFuture.get();
+
+            if (documentSnapshot.exists()) {
+                return Optional.ofNullable(documentSnapshot.toObject(parameterizedType));
+            }
+
+        } catch (InterruptedException | ExecutionException e) {
+            log.error("Exception occurred retrieving: {}", e.getMessage());
+        }
+
+        return Optional.empty();
     }
 }
