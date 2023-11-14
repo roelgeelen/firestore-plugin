@@ -1,12 +1,10 @@
 package com.differentdoors.firestore.repositories;
 
-import com.differentdoors.firestore.models.FirestoreConversation;
 import com.differentdoors.firestore.models.FirestoreTopic;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QuerySnapshot;
-import com.google.cloud.firestore.WriteResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 

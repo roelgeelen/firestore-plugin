@@ -1,6 +1,10 @@
 package com.differentdoors.firestore.repositories;
 
 import com.differentdoors.firestore.models.FirestoreUser;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +18,21 @@ public class FirestoreUserRepository extends AbstractFirestoreRepository<Firesto
     @Autowired
     private Firestore firestore;
 
+    private final ObjectMapper objectMapper = JsonMapper.builder()
+            .findAndAddModules()
+            .serializationInclusion(JsonInclude.Include.NON_NULL)
+            .build();
+
 
     public void save(FirestoreUser model) {
         String documentId = getDocumentId(model);
-        ApiFuture<WriteResult> resultApiFuture = firestore.collection("users").document(documentId).set(model, SetOptions.merge());
+        try {
+            Object user = objectMapper.readValue(objectMapper.writeValueAsString(model), Object.class);
+            firestore.collection("users").document(documentId).set(user, SetOptions.merge());
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     public List<FirestoreUser> whereArrayContains(String field, List<String> value) {

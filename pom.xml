@@ -10,7 +10,8 @@
 	</parent>
 	<groupId>com.differentdoors</groupId>
 	<artifactId>firestore-plugin</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.3-SNAPSHOT</version>
+	<packaging>jar</packaging>
 	<name>firestore-plugin</name>
 	<url>http://maven.apache.org</url>
 	<description>Demo project for Spring Boot</description>
@@ -58,6 +59,11 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 	</dependencies>
 
