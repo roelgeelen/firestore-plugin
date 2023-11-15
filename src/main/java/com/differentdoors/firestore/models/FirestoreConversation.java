@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.differentdoors.firestore.interfaces.DocumentId;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.DocumentReference;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,7 +31,7 @@ public class FirestoreConversation {
     private String body;
     private String managerComment;
     private String comment;
-    private String createdAt;
+    private Timestamp createdAt;
 
     @JsonSerialize(using = DocumentReferenceSerializer.class)
     @JsonDeserialize(using = DocumentReferenceDeserializer.class)
