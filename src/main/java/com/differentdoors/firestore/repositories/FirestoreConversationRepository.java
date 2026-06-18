@@ -47,7 +47,17 @@ public class FirestoreConversationRepository extends AbstractFirestoreRepository
     public void delete(String userId, String id) {
         ApiFuture<WriteResult> resultApiFuture = firestore.collection("users/" + userId + "/conversations").document(id).delete();
     }
-
+    public List<FirestoreConversation> all(String userId) {
+        ApiFuture<QuerySnapshot> querySnapshotApiFuture = firestore.collection("users/"+userId+"/conversations").orderBy("createdAt", Query.Direction.DESCENDING).get();
+        return retrieveListByQuery(querySnapshotApiFuture);
+    }
+    public List<FirestoreConversation> allOpen(String userId) {
+        ApiFuture<QuerySnapshot> querySnapshotApiFuture = firestore.collection("users/" + userId + "/conversations")
+                .whereEqualTo("isApproved", false)
+                .whereEqualTo("isPublished", true)
+                .get();
+        return retrieveListByQuery(querySnapshotApiFuture);
+    }
     public List<FirestoreConversation> allByYear(String userId, int year) {
         ApiFuture<QuerySnapshot> querySnapshotApiFuture = firestore.collection("users/" + userId + "/conversations")
                 .where(Filter.greaterThanOrEqualTo("createdAt", Timestamp.of(Date.valueOf(year+"-01-01"))))
