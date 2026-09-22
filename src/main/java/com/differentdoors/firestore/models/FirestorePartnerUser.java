@@ -2,7 +2,6 @@ package com.differentdoors.firestore.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.differentdoors.firestore.interfaces.DocumentId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,11 +15,7 @@ import java.util.List;
 @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class FirestorePartner {
-    @DocumentId
-    private String documentId;
-    private String display_name;
-    private String logo_url;
-    private FirestorePartnerMetadata metadata;
-    private List<FirestorePartnerUser> users;
+public class FirestorePartnerUser {
+    private String id;
+    private List<String> roles;
 }

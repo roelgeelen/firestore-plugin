@@ -15,4 +15,7 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FirestorePartnerMetadata {
     private String environment;
+    private String sp_partners;
+    private String discount;
+    private String hubspot_id;
 }
